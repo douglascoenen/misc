@@ -55,6 +55,10 @@ for i in tqdm(range(len(df.iloc[0,:]))):  # Loop through columns
                 pass
 
 if file_path[-3:] == "csv":
+    fname = file_path[:-4] + "_molar.csv"
     df.to_csv(file_path[:-4] + "_molar.csv", index=None)
 elif file_path[-4:] == "xlsx":
-    df.to_csv(file_path[:-5] + "_molar.csv", index=None)
+    fname = file_path[:-5] + "_molar.csv"
+    df.to_csv(fname, index=None)
+   
+print("All done! File saved at {}".format(fname))
