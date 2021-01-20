@@ -5,14 +5,16 @@ Script for turning the ppm values from Iolite 4 into molar ratios
 import re
 import pandas as pd
 from tqdm import tqdm  # Loading bar
-import tkinter as tk
 import tkinter.filedialog
 
 # Create the dialog window for choosing the file.
 file_path = tkinter.filedialog.askopenfilename()
 
-df = pd.read_excel(file_path, sheet_name="Data", engine="openpyxl")
-
+if file_path[-3:] == "csv":
+    df = pd.read_csv(file_path)
+elif file_path[-4:] == "xlsx":
+    df = pd.read_excel(file_path, sheet_name="Data", engine="openpyxl")
+    
 # Hard coding all the RAM values
 ramdict = {"H":"1.008", "He":"4.003","Li":"6.941","Be":"9.012","B":"10.811",
 "C":"12.011","N":"14.007","O":"15.999","F":"18.998","Ne":"20.18","Na":"22.99",
@@ -30,11 +32,13 @@ ramdict = {"H":"1.008", "He":"4.003","Li":"6.941","Be":"9.012","B":"10.811",
 "Hf":"178.49","Ta":"180.948","W":"183.84","Re":"186.207","Os":"190.23",
 "Ir":"192.217","Pt":"195.078","Au":"196.967","Hg":"200.59","Tl":"204.383",
 "Pb":"207.2","Bi":"208.98","Po":"209","At":"210","Rn":"222","Fr":"223",
-"Ra":"226","Ac":"227","Th":"232.038","Pa":"231.036","Uv":"238.029","Np":"237",
+"Ra":"226","Ac":"227","Th":"232.038","Pa":"231.036","U":"238.029","Np":"237",
 "Pu":"244","Am":"243","Cm":"247","Bk":"247","Cf":"251","Es":"252","Fm":"257",
 "Md":"258","No":"259","Lr":"262","Rf":"261","Db":"262","Sg":"266","Bh":"264",
-"Hs":"277","Mt":"268"}
+"Hs":"277","Mt":"268","Ds":"281.164","Rg":"280.165","Cn":"285.117",
+"Nh":"284.178","Fl":"289.19","Mc":"288.192","Lv":"293.204","Ts":"292.207","Og":"294.213"}
 
+# Main loop
 for i in tqdm(range(len(df.iloc[0,:]))):  # Loop through columns
     # Get the element of the column and the associated RAM value.
     element = re.search("([A-z]{1,2})", df.columns[i]).group()
@@ -46,8 +50,11 @@ for i in tqdm(range(len(df.iloc[0,:]))):  # Loop through columns
         if not pd.isna(df.iloc[j, i]):
             try:
                 x = float(df.iloc[j, i])
-                df.iloc[j, i] = (x/ramval) * (40.078/40000) * 1000
+                df.iloc[j, i] = (x/ramval) * (40.078/400400) * 1000
             except ValueError:
                 pass
 
-df.to_csv(file_path[:-5] + "_molar.csv", index=None)
+if file_path[-3:] == "csv":
+    df.to_csv(file_path[:-4] + "_molar.csv", index=None)
+elif file_path[-4:] == "xlsx":
+    df.to_csv(file_path[:-5] + "_molar.csv", index=None)
